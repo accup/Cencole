@@ -1,8 +1,14 @@
 # Cencole
 音楽再生CUIアプリケーション
 
-## 概要
-`sounddevice` と `librosa` で動いてます。
+## 依存関係
+- インタプリタ
+	- Python 3.6以降
+- Pythonライブラリ
+	- [sounddevice](https://github.com/spatialaudio/python-sounddevice/)
+	- [librosa](https://github.com/librosa/librosa)
+- コマンドラインツール（mp3, m4aを再生したい場合）
+	- [FFmpeg](http://ffmpeg.org/)
 
 ## 使い方
 ```
@@ -11,6 +17,7 @@ python -m Cencole "/path/to/オーディオファイルの入っているフォ�
 
 - 指定したフォルダから再帰的にオーディオファイルを探します。
 - 拡張子が .wav, .mp3, .m4a, .ogg のものをオーディオファイルとして認識します。
+
 
 
 ## Logs
