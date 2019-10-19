@@ -110,6 +110,7 @@ try:
 					break
 except Exception as e:
 	import sys
+	print()
 	print(e, file=sys.stderr)
 finally:
 	io_util.restore()

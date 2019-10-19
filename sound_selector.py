@@ -61,13 +61,16 @@ class SoundSelector (object):
 		return self.paths[self.loaded_path_index][2]
 		
 	def load(self):
-		with self.lock_object:
-			self.data = librosa.load(str(self.selected_path()), sr=self.sample_rate, mono=False)[0]
-			if len(self.data.shape) == 1:
-				self.data = self.data[None, :]
-			self.loaded_path_index = self.path_index
-			self.offset_frame = 0
-			self.paused = False
+		try:
+			with self.lock_object:
+				self.data = librosa.load(str(self.selected_path()), sr=self.sample_rate, mono=False)[0]
+				if len(self.data.shape) == 1:
+					self.data = self.data[None, :]
+				self.loaded_path_index = self.path_index
+				self.offset_frame = 0
+				self.paused = False
+		except DecodeError:
+			raise RuntimeError('オーディオファイルの読み込みに失敗しました')
 	
 	def load_next(self):
 		with self.lock_object:
