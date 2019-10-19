@@ -10,12 +10,6 @@ from typing import Union, Optional, List, Tuple
 RE_AUDIO_FILEEXT = re.compile(r'.*\.(wav|mp3|m4a|ogg)')
 
 
-class Command:
-	RESET  = 0
-	RESUME = 0
-	PAUSE  = 0
-
-
 class SoundSelector (object):
 	def __init__(
 			self,
