@@ -14,7 +14,7 @@ import time
 import sounddevice as sd
 from shutil import get_terminal_size
 from .sound_selector import SoundSelector
-from .text_util import ljust_lclip, rjust, quadrant_three_blocks, IndexFlapper
+from .text_util import lclip, ljust_lclip, rjust, quadrant_three_blocks, IndexFlapper
 from . import io_util
 
 try:
@@ -38,23 +38,35 @@ try:
 			if terminal_width != old_terminal_width:
 				print('\r' + (' ' * (terminal_width - 1)), end='')
 			old_terminal_width = terminal_width
+			title_width = (terminal_width - 62) // 2
 			selected_title = model.selected_title()
-			loaded_title = model.loaded_title() if model.is_anything_loaded() else ''
+			selected_ext = model.selected_extension()
+			if model.is_anything_loaded():
+				loaded_title = model.loaded_title()
+				loaded_ext = model.loaded_extension()
+			else:
+				loaded_title = ''
+				loaded_ext = ''
 			pause_state = "Play " if model.is_paused() else "Pause"
 			repeat_state = "1" if single_repeat else "A"
-			title_width = (terminal_width - 54) // 2
-			if 24 <= title_width:
+			if 20 <= title_width:
+				clipped_selected_title = lclip(selected_title, title_width) + selected_ext
+				clipped_loaded_title = lclip(loaded_title, title_width) + loaded_ext
 				print(
-					f'\r\u2195{ljust_lclip(selected_title, title_width)}'
-					f'|{repeat_state}{quadrant_three_blocks(flapper.index())}{ljust_lclip(loaded_title, title_width)}'
+					f'\r\u2195{ljust_lclip(clipped_selected_title, title_width + 4)}'
+					f'|{repeat_state}{quadrant_three_blocks(flapper.index())}'
+					f'{ljust_lclip(clipped_loaded_title, title_width + 4)}'
 					f'|Vol\u2190{rjust(str(model.volume()), 3)}\u2192'
 					f'|[\u21b5]Load [ ]{pause_state} [R]Rep [Q]Quit ',
 					end='')
 			else:
-				title_width = (terminal_width - 21) // 2
+				title_width = (terminal_width - 29) // 2
+				clipped_selected_title = lclip(selected_title, title_width) + selected_ext
+				clipped_loaded_title = lclip(loaded_title, title_width) + loaded_ext
 				print(
-					f'\r\u2195{ljust_lclip(selected_title, title_width)}'
-					f'|{repeat_state}{quadrant_three_blocks(flapper.index())}{ljust_lclip(loaded_title, title_width)}'
+					f'\r\u2195{ljust_lclip(clipped_selected_title, title_width + 4)}'
+					f'|{repeat_state}{quadrant_three_blocks(flapper.index())}'
+					f'{ljust_lclip(clipped_loaded_title, title_width + 4)}'
 					f'|Vol\u2190{rjust(str(model.volume()), 3)}\u2192 ',
 					end='')				
 			
