@@ -1,4 +1,5 @@
 import librosa
+from audioread import DecodeError
 
 import threading
 import re
@@ -17,7 +18,7 @@ class SoundSelector (object):
 			sample_rate = 44100):
 		self.lock_object = threading.Lock()
 		
-		self.loaded_data = None
+		self.data = None
 		self.paused = True
 		self._setup_paths(Path(base_dir))
 		
@@ -25,8 +26,8 @@ class SoundSelector (object):
 		self.amplitude_scale_percent = 100
 	
 	def _setup_paths(self, base_dir : Path):
-		self.paths : List[Tuple[Path, str]] = [
-			(path, path.with_suffix('').name)
+		self.paths : List[Tuple[Path, str, str]] = [
+			(path, path.with_suffix('').name, path.suffix.upper())
 			for path in base_dir.glob('**/*')
 			if RE_AUDIO_FILEEXT.fullmatch(path.name)]
 		self.path_index = 0
@@ -52,6 +53,12 @@ class SoundSelector (object):
 	
 	def loaded_title(self):
 		return self.paths[self.loaded_path_index][1]
+	
+	def selected_extension(self):
+		return self.paths[self.path_index][2]
+	
+	def loaded_extension(self):
+		return self.paths[self.loaded_path_index][2]
 		
 	def load(self):
 		with self.lock_object:
