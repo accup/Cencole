@@ -2,9 +2,9 @@
 音楽再生CUIアプリケーション
 
 ## 依存関係
-- インタプリタ
+- インタプリタ（Anacondaを推奨します）
 	- Python 3.6以降
-- Pythonライブラリ
+- Pythonライブラリ（Anacondaを推奨します）
 	- [sounddevice](https://github.com/spatialaudio/python-sounddevice/)
 	- [librosa](https://github.com/librosa/librosa)
 - コマンドラインツール（mp3, m4aを再生したい場合）
