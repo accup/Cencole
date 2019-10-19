@@ -65,8 +65,7 @@ try:
 					if single_repeat:
 						model.restart()
 					else:
-						model.move_next_title()
-						model.load()
+						model.load_next()
 				# 毎時更新
 				if not model.is_paused():
 					flapper.update()

@@ -68,6 +68,15 @@ class SoundSelector (object):
 			self.offset_frame = 0
 			self.paused = False
 	
+	def load_next(self):
+		with self.lock_object:
+			prev_path_index = self.path_index
+		self.path_index = self.loaded_path_index
+		self.move_next_title()
+		self.load()
+		with self.lock_object:
+			self.path_index = prev_path_index
+	
 	def unload(self):
 		with self.lock_object:
 			self.data = None
