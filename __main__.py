@@ -113,5 +113,4 @@ except Exception as e:
 	print(e, file=sys.stderr)
 finally:
 	io_util.restore()
-	exit(0)
 
