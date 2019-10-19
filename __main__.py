@@ -12,6 +12,7 @@ args = parser.parse_args()
 # メイン処理開始
 import time
 import sounddevice as sd
+from shutil import get_terminal_size
 from .sound_selector import SoundSelector
 from .text_util import ljust_lclip, rjust, quadrant_three_blocks, IndexFlapper
 from . import io_util
@@ -28,26 +29,44 @@ try:
 		exit(0)
 		
 	flapper = IndexFlapper(5, 4)
+	single_repeat = False
+	old_terminal_width = 0
 	
 	with sd.OutputStream(samplerate=44100, callback=model.callback_output_data):
 		while True:
+			terminal_width, _ = get_terminal_size()
+			if terminal_width != old_terminal_width:
+				print('\r' + (' ' * (terminal_width - 1)), end='')
+			old_terminal_width = terminal_width
 			selected_title = model.selected_title()
 			loaded_title = model.loaded_title() if model.is_anything_loaded() else ''
 			pause_state = "Play " if model.is_paused() else "Pause"
-			print(
-				'\r'
-				f'\u2195{ljust_lclip(selected_title, 24)}'
-				f'|{quadrant_three_blocks(flapper.index())} {ljust_lclip(loaded_title, 24)}'
-				f'|Vol.\u2190{rjust(str(model.volume()), 3)}\u2192'
-				f'| [\u21b5]Load [ ]{pause_state} [ESC]Quit ',
-				end='')
+			repeat_state = "1" if single_repeat else "A"
+			title_width = (terminal_width - 54) // 2
+			if 24 <= title_width:
+				print(
+					f'\r\u2195{ljust_lclip(selected_title, title_width)}'
+					f'|{repeat_state}{quadrant_three_blocks(flapper.index())}{ljust_lclip(loaded_title, title_width)}'
+					f'|Vol\u2190{rjust(str(model.volume()), 3)}\u2192'
+					f'|[\u21b5]Load [ ]{pause_state} [R]Rep [Q]Quit ',
+					end='')
+			else:
+				title_width = (terminal_width - 21) // 2
+				print(
+					f'\r\u2195{ljust_lclip(selected_title, title_width)}'
+					f'|{repeat_state}{quadrant_three_blocks(flapper.index())}{ljust_lclip(loaded_title, title_width)}'
+					f'|Vol\u2190{rjust(str(model.volume()), 3)}\u2192 ',
+					end='')				
 			
 			if not io_util.hit_any_key():
 				# キー入力以外の処理
 				if model.is_anything_loaded() and model.is_loaded_finished():
 					# 再生終了時の自動遷移
-					model.move_next_title()
-					model.load()
+					if single_repeat:
+						model.restart()
+					else:
+						model.move_next_title()
+						model.load()
 				# 毎時更新
 				if not model.is_paused():
 					flapper.update()
@@ -73,7 +92,9 @@ try:
 						model.pause()
 				elif k.enter():
 					model.load()
-				elif k.escape():
+				elif k.ascii(b'r'):
+					single_repeat = not single_repeat
+				elif k.ascii(b'q'):
 					# Exit
 					break
 except Exception as e:
